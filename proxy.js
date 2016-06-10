@@ -17,7 +17,7 @@
 
 
 (function(scope) {
-  if (scope.Proxy) {
+  if (scope['Proxy']) {
     return;
   }
   var lastRevokeFn = null;

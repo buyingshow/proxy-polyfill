@@ -284,6 +284,41 @@ void function() {
 
       var pp = new Proxy(p, {});
       assert.isSealed(p);
+
+      assert.throws(function() {
+        pp.newProperty = true;
+      }, TypeError);
+    });
+
+    test('seals array', function() {
+      var testArray = [7,8,9];
+      assert.isNotSealed(testArray);
+      var p = new Proxy(testArray, {});
+      assert.isSealed(testArray);
+      assert.isSealed(p, 'proxy should also be sealed');
+      assert.throws(function() {
+        p.push(1);
+      }, TypeError);
+
+      // slice is a copy of array
+      var slice = testArray.slice(0, 1);
+      slice.push(2);
+      assert.equal(slice.length, 2);
+    });
+
+    // nb. Trying to resolve issue #12
+    test('array as property', function() {
+      var testObj = {arr: [1,2,3]};
+      var p = new Proxy(testObj, {get: function(obj, prop) {
+        return obj[prop];  // zero get handler
+      }});
+
+      assert.equal(p.arr.length, 3);
+      p.arr.push(4);
+      assert.equal(p.arr.length, 4);
+
+      p.arr.splice(0,2);
+      assert.equal(p.arr.length, 2);
     });
   });
 
